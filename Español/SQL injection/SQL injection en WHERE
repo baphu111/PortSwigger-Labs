@@ -1,14 +1,37 @@
-# SQL Injection en WHERE Clause
+En el primer laboratorio, nos da una pista con la siguiente SQL Query:
 
-## Input malicioso
-**Input:** `' OR 1=1--`
+"SELECT * FROM products WHERE category = 'Gifts' AND released = 1".
 
-**Consulta resultante:** 
-```sql
+Que significa, Dame todos los productos DONDE-WHERE(explicito) la categoría sea 'Gifts' Y DONDE(implicito) estén liberados. Importante Mencionar que el WHERE continúa hasta encontrar:
+
+- ORDER BY
+- GROUP BY
+- HAVING
+- LIMIT
+- UNION
+- ; (fin de consulta)
+- ) (si está en subconsulta)
+
+Por eso en la oracion hay 2 WHERE, uno explicito y otro implicito. 
+
+#2. Input normal (sin inyección):
+Input: Gifts
+Resultado: WHERE category = 'Gifts' AND released = 1
+                           ↑     ↑
+                      comilla comilla
+                      abre   cierra
+
+3. input malicioso:
+Input: ' OR 1=1--
+
+Que se leeria asi :
 WHERE category = '' OR 1=1--' AND released = 1
-```
+                 ↑↑    ↑   ↑↑
+                 ||    |   ||
+                 ||    |   |└─ Comilla original del código (comentada)
+                 ||    |   └── Comentario SQL
+                 ||    └────── Tu código inyectado  
+                 |└─────────── Tu comilla (cierra inmediatamente)
+                 └──────────── Comilla original del código (abre)
 
-## Comando para probar
-```bash
-curl "https://target.com/products?category=' OR 1=1--"
-```
+De esta forma el input malicioso, modifica la consulta, quedando en verdadero y el efecto de est muestra TODOS los productos de categoria, esten activos o no
